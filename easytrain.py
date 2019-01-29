@@ -8,6 +8,7 @@ from train.submit.Submit import Submit
 from utils import TrainUtils
 from utils import Utils
 from utils.Log import Log
+from utils import Notifation
 
 
 def main():
@@ -25,6 +26,7 @@ def main():
         # 死循环一直查票，直到下单成功
         try:
             print('-' * 40)
+            Notifation.notify("开始执行抢票")
             ticketDetails = Query.loopQuery(TRAIN_DATE, FROM_STATION, TO_STATION,
                                             TrainUtils.passengerType2Desc(passengerTypeCode),
                                             TRAINS_NO,
@@ -36,6 +38,7 @@ def main():
             ticketDetails.tourFlag = TOUR_FLAG if TOUR_FLAG else 'dc'
             submit = Submit(ticketDetails)
             if submit.submit():
+                Notifation.notify("您已成功订购火车票！请在30分钟内前往12306官方网站进行支付！")
                 submit.showSubmitInfoPretty()
                 break
             time.sleep(1)

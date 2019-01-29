@@ -69,7 +69,7 @@ class Submit(object):
             passenger.passengerName = passengerJson['passenger_name'] or ''
             passenger.code = passengerJson['code'] or ''
             passenger.sexCode = passengerJson['sex_code'] or ''
-            passenger.sexName = passengerJson['sex_name'] or ''
+            # passenger.sexName = passengerJson['sex_name'] or ''
             passenger.bornDate = passengerJson['born_date'] or ''
             passenger.countryCode = passengerJson['country_code'] or ''
             passenger.passengerIdTypeCode = passengerJson['passenger_id_type_code'] or ''
