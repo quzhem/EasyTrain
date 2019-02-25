@@ -32,8 +32,8 @@ def login(baseUrl, username, pwd):
 def visitInsight():
     data = EasyHttp.get('https://zjpark.jingdata.com/api/metadata/insight/zj/login')
     Log.v("返回token结果 %s" % data['result']['token'])
-    # webbrowser.open("http://insight.jingdata.com/api/redirect?redirect_url=%s&token=%s" % (
-    #     'http://insight.jingdata.com', data['result']['token']))
+    webbrowser.open("http://insight.jingdata.com/api/redirect?redirect_url=%s&token=%s" % (
+        'http://insight.jingdata.com', data['result']['token']))
 
 
 def main():
