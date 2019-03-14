@@ -11,9 +11,8 @@ Notice
 -------------
 需要额外安装的第三方库:
 * [requests](https://github.com/requests/requests)
-* [Pillow](https://github.com/python-pillow/Pillow)
-* [PrettyTable](https://github.com/lmaurits/prettytable)
 * [colorama](https://github.com/tartley/colorama)
+* [pycryptodome](https://github.com/Legrandin/pycryptodome)     [windows下安装pycrypto失败](https://www.jianshu.com/p/fdc5a5854b04)
 
 **注:**
 * 登录模块分析可查看:[12306之登录流程解析](https://www.jianshu.com/p/ca93eba60609)
