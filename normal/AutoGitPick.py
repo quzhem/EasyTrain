@@ -16,14 +16,14 @@ def test(projectName=None, basePath='/Users/bjqxdn0702/IdeaProjects', branchs=[]
     Log.v("start %s " % projectName)
     for branch in branchs:
         path = basePath + "/" + projectName
-        excute(path, 'git pull ')
         checkResult = excute(path, 'git checkout ' + branch)
-        if (re.match('.* branch is up to date with \'origin/%s\'.*|.*Your branch is ahead.*' % branch, checkResult)):
+        if (re.match('Already on \'%s\'|.* branch is up to date with \'origin.*\'.*|.*Your branch is ahead.*' % branch, checkResult)):
             Log.v(checkResult)
         else:
             raise ValueError("checkout error %s", checkResult)
+        excute(path, 'git pull ')
         cherryPickResult = excute(path, 'git cherry-pick ' + pickVersion)
-        if (re.match('.* file changed, .* insertion.*, .* deletion(.*).*' % branch, checkResult)):
+        if (re.match('.* file changed, .* insertion.*, .* deletion(.*).*', checkResult)):
             Log.v(checkResult)
         else:
             raise ValueError("checkout error %s", checkResult)
@@ -43,7 +43,7 @@ def excute(cwd, shell):
 
 
 def main():
-    test('jingdata-saas-investment', branchs=['lvdi'], pickVersion='6a3586b')
+    test('jingdata-saas-investment', branchs=['dev-3.2-fund'], pickVersion='4753d57')
     Log.v("全部执行完成")
 
 
