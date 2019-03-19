@@ -17,17 +17,20 @@ def test(projectName=None, basePath='/Users/bjqxdn0702/IdeaProjects', branchs=[]
     for branch in branchs:
         path = basePath + "/" + projectName
         checkResult = excute(path, 'git checkout ' + branch)
-        if (re.match('Already on \'%s\'|.* branch is up to date with \'origin.*\'.*|.*Your branch is ahead.*' % branch, checkResult)):
+        if (re.match('Already on \'%s\'|.* branch is up to date with .*|.*Your branch is ahead.*|Your branch is behind .*' % branch,
+                     checkResult)):
             Log.v(checkResult)
         else:
             raise ValueError("checkout error %s", checkResult)
         excute(path, 'git pull ')
         cherryPickResult = excute(path, 'git cherry-pick ' + pickVersion)
-        if (re.match('.* file changed, .* insertion.*, .* deletion(.*).*', checkResult)):
+        if (re.match('.*file changed.*', checkResult)):
             Log.v(checkResult)
         else:
             raise ValueError("checkout error %s", checkResult)
         Log.v(cherryPickResult)
+        excute(path, 'git push ')
+
         # subprocess.check_call('git pull ', shell=True, cwd=basePath + "/" + projectName)
         # subprocess.check_call('git checkout ' + branch, shell=True, cwd=basePath + "/" + projectName)
         # subprocess.check_call('git cherry-pick ' + pickVersion, shell=True, cwd=basePath + "/" + projectName)
@@ -43,7 +46,7 @@ def excute(cwd, shell):
 
 
 def main():
-    test('jingdata-saas-investment', branchs=['dev-3.2-fund'], pickVersion='4753d57')
+    test('jingdata-saas-investment', branchs=['dev-zhangjiang'], pickVersion='e32d5af')
     Log.v("全部执行完成")
 
 
