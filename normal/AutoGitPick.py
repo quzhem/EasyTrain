@@ -24,11 +24,7 @@ def test(projectName=None, basePath='/Users/bjqxdn0702/IdeaProjects', branchs=[]
             raise ValueError("checkout error %s", checkResult)
         excute(path, 'git pull ')
         cherryPickResult = excute(path, 'git cherry-pick ' + pickVersion)
-        if (re.match('.*file changed.*', checkResult)):
-            Log.v(checkResult)
-        else:
-            raise ValueError("checkout error %s", checkResult)
-        Log.v(cherryPickResult)
+        Log.v("pick result %s" % cherryPickResult)
         excute(path, 'git push ')
 
         # subprocess.check_call('git pull ', shell=True, cwd=basePath + "/" + projectName)
@@ -46,7 +42,7 @@ def excute(cwd, shell):
 
 
 def main():
-    test('jingdata-saas-investment', branchs=['dev-zhangjiang'], pickVersion='e32d5af')
+    test('jingdata-saas-investment', branchs=['dev-3.2-fund'], pickVersion='07751c7')
     Log.v("全部执行完成")
 
 

@@ -111,7 +111,7 @@ def main():
     investment = Investment('https://zjpark.jingdata.com')
     investment.login('13811138111', '123456')
     # updateCompany()
-    repeatRelate()
+    # repeatRelate()
     # updateCompanyNewField()
 
 
