@@ -17,8 +17,9 @@ def test(projectName=None, basePath='/Users/bjqxdn0702/IdeaProjects', branchs=[]
     for branch in branchs:
         path = basePath + "/" + projectName
         checkResult = excute(path, 'git checkout ' + branch)
-        if (re.match('Already on \'%s\'|.* branch is up to date with .*|.*Your branch is ahead.*|Your branch is behind .*' % branch,
-                     checkResult)):
+        if (re.match(
+                'Already on \'%s\'|.* branch is up to date with .*|.*Your branch is ahead.*|Your branch is behind .*|Branch .* set up to track remote branch  .*' % branch,
+                checkResult)):
             Log.v(checkResult)
         else:
             raise ValueError("checkout error %s", checkResult)
@@ -42,7 +43,9 @@ def excute(cwd, shell):
 
 
 def main():
-    test('jingdata-saas-investment', branchs=['dev-3.2-fund'], pickVersion='07751c7')
+    # test('jingdata-saas-investment', branchs=['dev-3.4.0'], pickVersion='4fcc5b3')
+    test('jingdata-saas-investment', branchs=['dev'], pickVersion='e0b4c28 cc9de42 0e661a0 95a9f70')
+    # test('jingdata-saas-investment', branchs=['cnic'], pickVersion='4fcc5b3')
     Log.v("全部执行完成")
 
 
