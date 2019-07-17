@@ -21,7 +21,7 @@ def query():
                     infoContext = str(infoData.content, 'utf-8');
                     # infoMatch = re.match(r'.*<DIV style="WIDTH:.*" id=zoom class=nr_nr>(.*)<TABLE.*', infoContext, re.M | re.I | re.S)  # 查找数字
                     # infoTrimText = infoMatch.group(1)
-                    if (infoContext.find("辽宁省城乡建设集团有限责任公司大股东") > 0):
+                    if (infoContext.find("沈阳市黑牛投资有限公司") > 0):
                         # if (infoContext.find("土地拍卖公告沈土拍[2012]第69号") > 0 and infoContext.find("2012-012") >= 0):
                         Log.v(url)
                         webbrowser.open(url)

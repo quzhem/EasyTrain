@@ -39,9 +39,13 @@ def repeatRelate():
     while (True):
         # 查询为空的，需要重新关联的公司
         tableData = investment.QueryData('company', currentPage,
-                                         filters=[{"fieldName": "insight_related_id__u", "operator": "IS", "fieldValues": ["ff"]}],
+                                         filters=[{"fieldName": "capital_market", "operator": "N", "fieldValues": ["-"]}],
                                          # filters=[{"fieldName": "insight_related_id__u", "operator": "IS", "fieldValues": ["gg"]}],
                                          orders=[
+                                             # tableData = investment.QueryData('company', currentPage,
+                                             #                                  filters=[{"fieldName": "insight_related_id__u", "operator": "IS", "fieldValues": ["ff"]}],
+                                             #                                  # filters=[{"fieldName": "insight_related_id__u", "operator": "IS", "fieldValues": ["gg"]}],
+                                             #                                  orders=[
                                              {"fieldName": "created_at", "asc": False}])
         if (len(tableData) <= 0):
             break
@@ -59,6 +63,8 @@ def repeatRelate():
             insight_related_id = None
             count += 1
             keyWordResult = EasyHttp.post(Investment.baseUrl + '/api/metadata/insight/search/word', {"keyWord": "%s" % name})
+            if ('list' not in keyWordResult['result']):
+                continue
             keyWordList = keyWordResult['result']['list']
 
             for keyWordData in keyWordList:
@@ -72,8 +78,13 @@ def repeatRelate():
                                          )
             if (relateResult['code'] != 0):
                 Log.v("关联失败 %s" % relateResult)
+                relateResult = EasyHttp.post(Investment.baseUrl + '/api/metadata/insight/relatedInsightData',
+                                             {"describeApiName": "company", "dataId": "%s" % id, "insightRelatedObject": "%s" % name,
+                                              "insightRelatedObjectId": "%s" % insight_related_id})
+                Log.v("第二次关联结果 %s" % relateResult)
+            else:
                 # raise ValueError("关联失败 %s" % relateResult)
-
+                Log.v("关联成功：%s" % name)
         currentPage += 1
     Log.v("成功处理数据条数 %s" % count)
 
@@ -109,9 +120,9 @@ def main():
     # investment = Investment('https://investment-dev.jingdata.com')
     # investment.login('13800138000', '123456')
     investment = Investment('https://zjpark.jingdata.com')
-    investment.login('13811138111', '123456')
+    investment.login('15100000001', '123456')
     # updateCompany()
-    # repeatRelate()
+    repeatRelate()
     # updateCompanyNewField()
 
 

@@ -44,8 +44,9 @@ def excute(cwd, shell):
 
 def main():
     # test('jingdata-saas-investment', branchs=['dev-3.4.0'], pickVersion='4fcc5b3')
-    test('jingdata-saas-investment', branchs=['dev'], pickVersion='e0b4c28 cc9de42 0e661a0 95a9f70')
-    # test('jingdata-saas-investment', branchs=['cnic'], pickVersion='4fcc5b3')
+    # test('jingdata-saas-investment', branchs=['dev'], pickVersion='af60474 cc9de42 0e661a0 95a9f70')
+    test('jingdata-saas-investment', branchs=['dev'], pickVersion='e87985e')
+    # test('jingdata-saas-investment', branchs=['kcfund-3.4.1'], pickVersion='090770f')
     Log.v("全部执行完成")
 
 
