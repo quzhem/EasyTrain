@@ -35,17 +35,16 @@ class PgSql:
     def select(self, sqlCode, page=1, pageSize=10):
         offset = 0 if page <= 1 else page * pageSize
         sqlCode = "select * from (%s) as a offset %s limit %s " % (sqlCode, offset, pageSize)
-        self.execute(sqlCode)
-        return self._cursor.fetchall()
+        return self.execute(sqlCode)
 
-    def insert(self, sqlCode):
-        self.executeWithTransaction(sqlCode)
+    def insert(self, sqlCode, vars=None):
+        self.executeWithTransaction(sqlCode, vars)
 
-    def update(self, sqlCode):
-        self.executeWithTransaction(sqlCode)
+    def update(self, sqlCode, vars=None):
+        self.executeWithTransaction(sqlCode, vars)
 
-    def delete(self, sqlCode):
-        self.executeWithTransaction(sqlCode)
+    def delete(self, sqlCode, vars=None):
+        self.executeWithTransaction(sqlCode, vars)
 
     def close(self):
         self._cursor.close()
@@ -59,25 +58,36 @@ class PgSql:
         :return:
         """
         try:
-            self.cursor.execute(sql_code + " RETURNING " + field)
+            self._cursor.execute(sql_code + " RETURNING " + field)
         except Exception as e:
             print(e)
             self._conn.rollback()
-            self.cursor.execute(sql_code + " RETURNING " + field)
+            self._cursor.execute(sql_code + " RETURNING " + field)
         self.conn.commit()
 
-        return self.cursor.fetchone()
+        return self._cursor.fetchone()
 
-    def executeWithTransaction(self, sqlCode):
+    def executeWithTransaction(self, sqlCode, vars=None):
         try:
-            self.execute(sqlCode)
+            self.execute(sqlCode, vars)
             self._conn.commit()
         except Exception as e:
             self._conn.rollback()
             Log.v(e)
 
-    def execute(self, sqlCode):
-        return self._cursor.execute(sqlCode)
+    def execute(self, sqlCode, vars=None):
+        self._cursor.execute(sqlCode, vars)
+        if (self._cursor.description is None):
+            return
+        data = self._cursor.fetchall()
+        index = self._cursor.description
+        result = []
+        for res in data:
+            row = {}
+            for i in range(len(index) - 1):
+                row[index[i][0]] = res[i]
+            result.append(row)
+        return result
 
     def __del__(self):
         Log.v("关闭数据库")
@@ -87,13 +97,15 @@ class PgSql:
 def main():
     pgsql = PgSql("192.168.6.85", "investment", "postgres", "kh^%kfdk3ff23")
     # pgsql = PgSql("localhost", "postgres", "postgres", "123456")
+    pgsql.delete("delete from paas_mt_insight_profit where id=%s", ('ceshi',))
     pgsql.insert("insert into paas_mt_insight_profit (id,tenant_id,object_describe_api_name) values('ceshi','1','1')")
     rows = pgsql.select("SELECT * from paas_mt_insight_profit where id='%s'" % 'ceshi')
     Log.v(rows)
     pgsql.update("update paas_mt_insight_profit set tenant_id='%s'" % 2)
     rows = pgsql.select("SELECT * from paas_mt_insight_profit where id='%s'" % 'ceshi')
     Log.v(rows)
-    assert rows[0]['tenant_id'] == '2','ss'
+    assert rows[0]['tenant_id'] == '2', 'ss'
+    pgsql.delete("delete from paas_mt_insight_profit where id=%s", ('ceshi',))
 
 
 if __name__ == '__main__':
