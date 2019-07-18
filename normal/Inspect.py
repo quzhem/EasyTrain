@@ -30,7 +30,8 @@ def monitor():
         'Delete': lambda x, y: doDeleteData(x, y)
     }
     while (True):
-        # {"type":"Add","objectName":"IcUserObj","_source":[{"id":"1","name":"报名"}]}
+        # "{\"type\":\"Add\",\"objectName\":\"IcUserObj\",\"_source\":[{\"id\":\"1\",\"name\":\"报名\"}]}"
+        # "{\"type\":\"Delete\",\"objectName\":\"IcUserObj\",\"_source\":[{\"id\":\"1\",\"name\":\"报名\"}]}"
         # {'type':'Add、Update、Delete','objectName':'','_source':[{'id':'1','name':'报名'}]}
         popData = connection.blpop(key)[1];
         result = str(popData, encoding="utf-8")
@@ -61,7 +62,7 @@ def doDeleteData(objectName, _source):
     indexName = config['index_name']
     dataList = _source
     dictList = [{
-        '_op_type': 'delete', "_id": x.id, "_index": indexName, "_type": "info", '_source': dataList} for x in dataList]
+        '_op_type': 'delete', "_id": x['id'], "_index": indexName, "_type": "info", '_source': x} for x in dataList]
     res = helpers.bulk(es, dictList)
     Log.v("delete es data: %s,result %s" % ([x for x in dataList], res))
 
