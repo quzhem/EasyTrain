@@ -33,8 +33,8 @@ class PgSql:
             port=self.port)
 
     def select(self, sqlCode, page=1, pageSize=10):
-        offset = 0 if page <= 1 else page * pageSize
-        sqlCode = "select * from (%s) as a offset %s limit %s " % (sqlCode, offset, pageSize)
+        offset = 0 if page <= 1 else (page - 1) * pageSize
+        sqlCode = "%s offset %s limit %s " % (sqlCode, offset, pageSize)
         return self.execute(sqlCode)
 
     def insert(self, sqlCode, vars=None):
