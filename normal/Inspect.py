@@ -1,28 +1,46 @@
 import redis
 from utils.Log import Log
 import json
-from elasticsearch import Elasticsearch
-from elasticsearch import helpers
+from elasticsearch import Elasticsearch, helpers
 from utils.PgSql import PgSql
 import cpca
 import re
+from utils import Utils
 
 key = 'MonitorData'
 
 es = Elasticsearch()
 pgSql = PgSql('localhost', 'guns20190223', 'postgres', '123456')
+mapping = {
+    "mappings": {
+        "info": {
+            "properties": {
+                "location": {
+                    "type": "geo_shape"
+                }
+            }
+        }
+    }
+}
 
-_indexMapping = {
+xMap = {
     'UserOrgObj': {
         'index_name': 'index_ic_user',
+        'queryData': lambda x: doQueryUserData(x),
         'AddBefore': lambda x: doAddUserDataBefore(x)
     }
+}
+# 特殊的市到省的映射
+pcMap = {
+    "杭州市": "浙江省"
 }
 
 
 def createEsIndex(esIndexName):
-    es.indices.create(index=esIndexName, ignore=400)
-    Log.v("es index %s create finished!!" % esIndexName)
+    flag = es.indices.exists(esIndexName)
+    if (not flag):
+        es.indices.create(index=esIndexName, body=mapping)
+        Log.v("es index %s create finished!!" % esIndexName)
 
 
 def monitor():
@@ -38,7 +56,7 @@ def monitor():
         # {'type':'Add、Update、Delete','object_name':'','info':[{'id':'1','name':'报名'}]}
         popData = connection.blpop(key)[1];
         result = str(popData, encoding="utf-8")
-        Log.v("redis pop result %s" % result)
+        Log.w("redis pop result %s" % result)
         obj = json.loads(result)
         type = obj['type']
         objectName = obj['object_name']
@@ -46,11 +64,13 @@ def monitor():
         switch[type](objectName, _source)
 
 
-def doAddData(objectName, _source):
-    config = _indexMapping[objectName]
+def doAddData(objectName, _source=None, dataList=None):
+    config = xMap[objectName]
     indexName = config['index_name']
+    if (_source != None):
+        idList = [x['id'] for x in _source]
+        config['queryData'](idList)
 
-    dataList = _source
     if ('AddBefore' in config and config['AddBefore'] is not None):
         dataList = config['AddBefore'](dataList)
     dictList = [{
@@ -60,7 +80,7 @@ def doAddData(objectName, _source):
 
 
 def doDeleteData(objectName, _source):
-    config = _indexMapping[objectName]
+    config = xMap[objectName]
     indexName = config['index_name']
     dataList = _source
     dictList = [{
@@ -70,6 +90,8 @@ def doDeleteData(objectName, _source):
 
 
 def specialConvert(address):
+    if (Utils.isEmpty(address)):
+        return ''
     address = str(address)
     matchObj = re.match('(.*省)?.*市.*区', address, re.M | re.I)
     if (matchObj is not None):
@@ -78,29 +100,49 @@ def specialConvert(address):
         return address.replace('苏州', '苏州市')
     if (address.startswith("海北州")):
         return address.replace('海北州', '海北藏族自治州')
+    if (address.startswith("中路高科")):
+        return '北京市' + address
     return address
+
+
+def doQueryUserData(idList):
+    idStr = ','.join(
+        ["'" + x + "'" for x in idList])
+    dataList = pgSql.select(
+        "select * from ic_user a inner join ic_user_org b on a.id=b.id where a.is_del='0' and a.id in (%s)order by a.create_time" % idStr)
+    return dataList
 
 
 def doAddUserDataBefore(dataList):
     for data in dataList:
         address = data['address']
         name = data['name']
-        if (address is None or address.strip() == ''):
-            address = name
-        address, city, df, house, province = extractAddress(address, data)
-        # 从名称中再提取一次
+
+        address, city, df, house, province, district = extractAddress(address)
+        # # 从名称中再提取一次
         if (province is None or province.strip() == ''):
-            address = name + address
-            address, city, df, house, province = extractAddress(address, data)
-        if (not all([province, city, house])):
-            Log.v("address %s" % address)
-            Log.v("数据id %s" % data['id'])
-            Log.v(df)
-            Log.v("----------------------")
+            address = name + address if address != None else name
+            address, city, df, house, province, district = extractAddress(address)
+
+        if (not all([province])):
+            Log.w("----------------------")
+            Log.w("address %s" % address)
+            Log.w("数据id %s" % data['id'])
+            Log.w(df)
+            Log.w("----------------------")
+        data['address_province'] = province
+        data['address_city'] = city
+        data['address_district'] = district
+        if (isNaN(house) is not True):
+            data['address_house'] = house
+        data['location'] = {
+            "type": "point",
+            "coordinates": [13.400544, 52.530286]
+        }
     return dataList
 
 
-def extractAddress(address, data):
+def extractAddress(address):
     address = specialConvert(address)
     df = cpca.transform([address], cut=False)
     dict = df.to_dict('index')[0]
@@ -108,16 +150,14 @@ def extractAddress(address, data):
     city = dict['市']
     district = dict['区']
     house = str(dict['地址'])
-    if (district is not None and '区' in house):
+    if (Utils.isEmpty(district) and '区' in house):
+        # 高新开发区特殊的新区
         arr = str(house).split('区')
         district = arr[0] + '区'
         house = arr[1]
-    data['address_province'] = province
-    data['address_city'] = city
-    data['address_district'] = district
-    if (isNaN(house) is not True):
-        data['address_house'] = house
-    return address, city, df, house, province
+    if (pcMap.get(city) != None and pcMap.get(city) != province):
+        province = pcMap[city]
+    return address, city, df, house, province, district
 
 
 def isNaN(num):
@@ -126,7 +166,7 @@ def isNaN(num):
 
 # 从数据库中同步用户数据
 def syncUserData():
-    createEsIndex(_indexMapping['UserOrgObj']['index_name'])
+    createEsIndex(xMap['UserOrgObj']['index_name'])
     page = 1
     pageSize = 20
     count = 0
@@ -135,7 +175,7 @@ def syncUserData():
         Log.v(data)
         if (data is None or len(data) == 0):
             break
-        doAddData('UserOrgObj', data)
+        doAddData('UserOrgObj', dataList=data)
         page += 1
         count += len(data)
     Log.v("成功入库用户数据 %s 条" % count)
@@ -153,5 +193,7 @@ def getRedisConnection():
 
 
 if __name__ == '__main__':
+    doQueryUserData(['11'])
+    Log.load(filename='../logs/Inspect.log')
     syncAllData()
     monitor()

@@ -38,6 +38,10 @@ def funcWithTry(count=10):
     return func
 
 
+def isEmpty(obj):
+    return obj == None or str(obj).strip() == ''
+
+
 @funcWithTry()
 def ceshi(a='11'):
     Log.v("ceshi")

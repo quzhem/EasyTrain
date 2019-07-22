@@ -32,7 +32,7 @@ class PgSql:
             host=self.host,
             port=self.port)
 
-    def select(self, sqlCode, page=1, pageSize=10):
+    def select(self, sqlCode: object, page: object = 1, pageSize: object = 10) -> object:
         offset = 0 if page <= 1 else (page - 1) * pageSize
         sqlCode = "%s offset %s limit %s " % (sqlCode, offset, pageSize)
         return self.execute(sqlCode)
