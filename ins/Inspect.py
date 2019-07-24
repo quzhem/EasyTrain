@@ -6,17 +6,72 @@ from utils.PgSql import PgSql
 import cpca
 import re
 from utils import Utils
+from ins.NationArea import NationArea
 
 key = 'MonitorData'
-
-es = Elasticsearch()
-pgSql = PgSql('localhost', 'guns20190223', 'postgres', '123456')
 mapping = {
     "mappings": {
         "info": {
             "properties": {
-                "location": {
-                    "type": "geo_shape"
+                "address": {
+                    "type": "keyword"
+                },
+                "address_city": {
+                    "type": "keyword"
+                },
+                "address_city_location": {
+                    "type": "keyword"
+                },
+                "address_district": {
+                    "type": "keyword"
+                },
+                "address_house": {
+                    "type": "keyword"
+                },
+                "address_province": {
+                    "type": "keyword"
+                },
+                "address_province_location": {
+                    "type": "keyword"
+                },
+                "contacts": {
+                    "type": "keyword"
+                },
+                "contacts_info": {
+                    "type": "keyword"
+                },
+                "email": {
+                    "type": "keyword"
+                },
+                "fax": {
+                    "type": "keyword"
+                },
+                "id": {
+                    "type": "keyword"
+                },
+                "is_del": {
+                    "type": "keyword"
+                },
+                "login_name": {
+                    "type": "keyword"
+                },
+                "org_phone": {
+                    "type": "keyword"
+                },
+                "org_propertis": {
+                    "type": "keyword"
+                },
+                "pwd": {
+                    "type": "keyword"
+                },
+                "salt": {
+                    "type": "keyword"
+                },
+                "state": {
+                    "type": "keyword"
+                },
+                "remark": {
+                    "type": "keyword"
                 }
             }
         }
@@ -34,6 +89,28 @@ xMap = {
 pcMap = {
     "杭州市": "浙江省"
 }
+es = None
+pgSql = None
+nationArea = None
+connection = None
+
+
+def init():
+    global es
+    global pgSql
+    global nationArea
+    global connection
+    Log.load(filename='../logs/Inspect.log')
+    es = Elasticsearch()
+    pgSql = PgSql('localhost', 'guns20190223', 'postgres', '123456')
+    nationArea = NationArea(pgSql)
+    connection = getRedisConnection()
+
+
+def getRedisConnection():
+    pool = redis.ConnectionPool(host='localhost', port=6379)
+    red = redis.Redis(connection_pool=pool)
+    return red
 
 
 def createEsIndex(esIndexName):
@@ -44,7 +121,6 @@ def createEsIndex(esIndexName):
 
 
 def monitor():
-    connection = getRedisConnection()
     switch = {
         'Add': lambda x, y: doAddData(x, y),
         'Update': lambda x, y: doAddData(x, y),
@@ -69,7 +145,7 @@ def doAddData(objectName, _source=None, dataList=None):
     indexName = config['index_name']
     if (_source != None):
         idList = [x['id'] for x in _source]
-        config['queryData'](idList)
+        dataList = config['queryData'](idList)
 
     if ('AddBefore' in config and config['AddBefore'] is not None):
         dataList = config['AddBefore'](dataList)
@@ -135,11 +211,29 @@ def doAddUserDataBefore(dataList):
         data['address_district'] = district
         if (isNaN(house) is not True):
             data['address_house'] = house
-        data['location'] = {
-            "type": "point",
-            "coordinates": [13.400544, 52.530286]
-        }
+        if (Utils.isNotEmpty(province)):
+            provinceResult = nationArea.queryProvinceByLabel(province)
+            if (Utils.isNotEmpty(provinceResult)):
+                valueId = provinceResult['value']
+                longitude, latitude = extractLocation(provinceResult)
+                data['address_province_location'] = '#'.join([province, ','.join([longitude, latitude])])
+                if (Utils.isNotEmpty(city)):
+                    cityResult = nationArea.queryCityByLabel(city, valueId)
+                    valueId = cityResult['value']
+                    longitude, latitude = extractLocation(cityResult)
+                data['address_city_location'] = '#'.join([city, ','.join([longitude, latitude])])
+
+    # data['location'] = {
+    #     "type": "point",
+    #     "coordinates": [13.400544, 52.530286]
+    # }
+    # data['coordinate'] = "13.400544,52.530286"
     return dataList
+
+
+def extractLocation(dbResult):
+    properties = json.loads(dbResult['properties'])
+    return str(properties['longitude']), str(properties['latitude'])
 
 
 def extractAddress(address):
@@ -186,14 +280,7 @@ def syncAllData():
     syncUserData()
 
 
-def getRedisConnection():
-    pool = redis.ConnectionPool(host='localhost', port=6379)
-    red = redis.Redis(connection_pool=pool)
-    return red
-
-
 if __name__ == '__main__':
-    doQueryUserData(['11'])
-    Log.load(filename='../logs/Inspect.log')
+    init()
     syncAllData()
     monitor()

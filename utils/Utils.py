@@ -42,6 +42,10 @@ def isEmpty(obj):
     return obj == None or str(obj).strip() == ''
 
 
+def isNotEmpty(obj):
+    return not isEmpty(obj)
+
+
 @funcWithTry()
 def ceshi(a='11'):
     Log.v("ceshi")
