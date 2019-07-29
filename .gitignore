@@ -1,9 +1,4 @@
-*.*
-!define/**
-!net/**
-!train/**
-!utils/**
-!.gitignore
-!*.py
-*.pyc
-!ReadMe.md
+
+/build/
+/dist/
+/logs/
