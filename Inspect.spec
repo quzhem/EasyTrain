@@ -4,10 +4,10 @@ block_cipher = None
 
 
 a = Analysis(['ins/Inspect.py'],
-             pathex=['/Users/bjqxdn0702/PycharmProjects/EasyTrain'],
+             pathex=['E:\\quzf\\Work\\EasyTrain'],
              binaries=[],
-             datas=[( 'venv/lib/python3.7/site-packages/cpca/resources', 'cpca/resources' )],
-             hiddenimports=[],
+             datas=[( 'D:/quzf/my/python/Python37/Lib/site-packages/cpca/resources', 'cpca/resources' )],
+             hiddenimports=['numpy.random.bounded_integers','numpy.random.entropy'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
