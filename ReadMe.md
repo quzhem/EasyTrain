@@ -25,3 +25,8 @@ Notice
 
 打包命令：
 * pyinstaller  Inspect.spec ins/Inspect.py
+
+包依赖管理：
+* pip freeze >requirements.txt 生成当前项目的依赖导出到文件
+* pip install -r requirements.txt
+
