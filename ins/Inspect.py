@@ -4,6 +4,7 @@ import json
 from elasticsearch import Elasticsearch, helpers
 from utils.PgSql import PgSql
 import cpca
+# import cpca.resources
 import re
 from utils import Utils
 from ins.NationArea import NationArea

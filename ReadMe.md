@@ -22,3 +22,6 @@ Notice
 
 参考文档；
 [python ES](https://elasticsearch-py.readthedocs.io/en/master/)
+
+打包命令：
+* pyinstaller  Inspect.spec ins/Inspect.py
