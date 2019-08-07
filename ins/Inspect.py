@@ -10,86 +10,311 @@ from utils import Utils
 from ins.NationArea import NationArea
 
 key = 'MonitorData'
-mapping = {
-    "mappings": {
-        "info": {
-            "properties": {
-                "address": {
-                    "type": "keyword"
-                },
-                "address_city": {
-                    "type": "keyword"
-                },
-                "address_city_location": {
-                    "type": "keyword"
-                },
-                "address_district": {
-                    "type": "keyword"
-                },
-                "address_house": {
-                    "type": "keyword"
-                },
-                "address_province": {
-                    "type": "keyword"
-                },
-                "address_province_location": {
-                    "type": "keyword"
-                },
-                "contacts": {
-                    "type": "keyword"
-                },
-                "contacts_info": {
-                    "type": "keyword"
-                },
-                "email": {
-                    "type": "keyword"
-                },
-                "fax": {
-                    "type": "keyword"
-                },
-                "id": {
-                    "type": "keyword"
-                },
-                "is_del": {
-                    "type": "keyword"
-                },
-                "login_name": {
-                    "type": "keyword"
-                },
-                "org_phone": {
-                    "type": "keyword"
-                },
-                "org_propertis": {
-                    "type": "keyword"
-                },
-                "pwd": {
-                    "type": "keyword"
-                },
-                "salt": {
-                    "type": "keyword"
-                },
-                "state": {
-                    "type": "keyword"
-                },
-                "remark": {
-                    "type": "keyword"
-                },
-                "create_time": {
-                    "type": "date"
-                },
-                "last_modified_time": {
-                    "type": "date"
-                }
-            }
-        }
-    }
-}
 
 xMap = {
     'UserOrgObj': {
         'index_name': 'index_ic_user',
-        'queryData': lambda x: doQueryUserData(x),
-        'AddBefore': lambda x: doAddUserDataBefore(x)
+        'AddBefore': lambda x: doAddUserDataBefore(x),
+        'mapping': {
+            "mappings": {
+                "info": {
+                    "properties": {
+                        "address": {
+                            "type": "keyword"
+                        },
+                        "address_city": {
+                            "type": "keyword"
+                        },
+                        "address_city_location": {
+                            "type": "keyword"
+                        },
+                        "address_district": {
+                            "type": "keyword"
+                        },
+                        "address_house": {
+                            "type": "keyword"
+                        },
+                        "address_province": {
+                            "type": "keyword"
+                        },
+                        "address_province_location": {
+                            "type": "keyword"
+                        },
+                        "contacts": {
+                            "type": "keyword"
+                        },
+                        "contacts_info": {
+                            "type": "keyword"
+                        },
+                        "email": {
+                            "type": "keyword"
+                        },
+                        "fax": {
+                            "type": "keyword"
+                        },
+                        "id": {
+                            "type": "keyword"
+                        },
+                        "is_del": {
+                            "type": "keyword"
+                        },
+                        "login_name": {
+                            "type": "keyword"
+                        },
+                        "org_phone": {
+                            "type": "keyword"
+                        },
+                        "org_propertis": {
+                            "type": "keyword"
+                        },
+                        "pwd": {
+                            "type": "keyword"
+                        },
+                        "salt": {
+                            "type": "keyword"
+                        },
+                        "state": {
+                            "type": "keyword"
+                        },
+                        "remark": {
+                            "type": "keyword"
+                        },
+                        "create_time": {
+                            "type": "date"
+                        },
+                        "last_modified_time": {
+                            "type": "date"
+                        }
+                    }
+                }
+            }
+        },
+        'allSql': "select * from ic_user a inner join ic_user_org b on a.id=b.id where a.is_del='0' order by a.create_time",
+        'idFilterSql': "select * from ic_user a inner join ic_user_org b on a.id=b.id where a.is_del='0' and a.id in (%s) order by a.create_time"
+
+    },
+    'SignObj': {
+        'index_name': 'index_ic_sign',
+        'mapping': {
+            "mappings": {
+                "info": {
+                    "properties": {
+                        "address": {
+                            "type": "keyword"
+                        },
+                        "batch": {
+                            "type": "keyword"
+                        },
+                        "billing_id": {
+                            "type": "keyword"
+                        },
+                        "contacts": {
+                            "type": "keyword"
+                        },
+                        "contacts_info": {
+                            "type": "keyword"
+                        },
+                        "create_time": {
+                            "type": "date"
+                        },
+                        "email": {
+                            "type": "keyword"
+                        },
+                        "entries_number": {
+                            "type": "long"
+                        },
+                        "equipment_name": {
+                            "type": "keyword"
+                        },
+                        "equipment_number": {
+                            "type": "keyword"
+                        },
+                        "equipment_vender": {
+                            "type": "keyword"
+                        },
+                        "equipment_version": {
+                            "type": "keyword"
+                        },
+                        "fax": {
+                            "type": "keyword"
+                        },
+                        "id": {
+                            "type": "keyword"
+                        },
+                        "is_del": {
+                            "type": "keyword"
+                        },
+                        "last_modified_time": {
+                            "type": "date"
+                        },
+                        "last_operate": {
+                            "type": "long"
+                        },
+                        "name": {
+                            "type": "keyword"
+                        },
+                        "org_id": {
+                            "type": "keyword"
+                        },
+                        "org_name": {
+                            "type": "keyword"
+                        },
+                        "parm_type": {
+                            "type": "keyword"
+                        },
+                        "queue_number": {
+                            "type": "keyword"
+                        },
+                        "remark": {
+                            "type": "keyword"
+                        },
+                        "sign_id": {
+                            "type": "keyword"
+                        },
+                        "state": {
+                            "type": "keyword"
+                        },
+                        "year": {
+                            "type": "date",
+                            "format": "yyyy"
+                        }
+                    }
+                }
+            }
+        },
+        'allSql': "select * from ic_sign a inner join ic_equipment b on a.id=b.id where a.is_del='0'  order by a.create_time",
+        'idFilterSql': "select * from ic_sign a inner join ic_equipment b on a.id=b.id where a.is_del='0' and a.id in (%s) order by a.create_time"
+    },
+    'BillingObj': {
+        'index_name': 'index_ic_billing',
+        'mapping': {
+            "mappings": {
+                "info": {
+                    "properties": {
+                        "account_bank": {
+                            "type": "keyword"
+                        },
+                        "account_bank_no": {
+                            "type": "keyword"
+                        },
+                        "address": {
+                            "type": "keyword"
+                        },
+                        "contact_info": {
+                            "type": "keyword"
+                        },
+                        "contacts": {
+                            "type": "keyword"
+                        },
+                        "create_time": {
+                            "type": "date"
+                        },
+                        "created_by": {
+                            "type": "keyword"
+                        },
+                        "email": {
+                            "type": "keyword"
+                        },
+                        "id": {
+                            "type": "keyword"
+                        },
+                        "invoice_add": {
+                            "type": "keyword"
+                        },
+                        "invoice_tel": {
+                            "type": "keyword"
+                        },
+                        "is_del": {
+                            "type": "keyword"
+                        },
+                        "last_modified_by": {
+                            "type": "keyword"
+                        },
+                        "last_modified_time": {
+                            "type": "date"
+                        },
+                        "name": {
+                            "type": "keyword"
+                        },
+                        "org_id": {
+                            "type": "keyword"
+                        },
+                        "price": {
+                            "type": "float"
+                        },
+                        "remark": {
+                            "type": "keyword"
+                        },
+                        "rise_name": {
+                            "type": "keyword"
+                        },
+                        "status": {
+                            "type": "keyword"
+                        },
+                        "tax_number": {
+                            "type": "keyword"
+                        },
+                        "ticket_content": {
+                            "type": "keyword"
+                        },
+                        "type": {
+                            "type": "keyword",
+                        }
+                    }
+                }
+            }
+        },
+        'allSql': "select * from ic_billing as a  where a.is_del='0' order by a.create_time",
+        'idFilterSql': "select * from ic_billing as a  where a.is_del='0' and a.id in (%s) order by a.create_time "
+    },
+    'CertificateObj': {
+        'index_name': 'index_ic_certificate',
+        'mapping': {
+            "mappings": {
+                "info": {
+                    "properties": {
+                        "create_time": {
+                            "type": "date"
+                        },
+                        "created_by": {
+                            "type": "keyword"
+                        },
+                        "file_name": {
+                            "type": "keyword"
+                        },
+                        "id": {
+                            "type": "keyword"
+                        },
+                        "is_del": {
+                            "type": "keyword"
+                        },
+                        "last_modified_by": {
+                            "type": "keyword"
+                        },
+                        "last_modified_time": {
+                            "type": "date"
+                        },
+                        "name": {
+                            "type": "keyword"
+                        },
+                        "org_id": {
+                            "type": "keyword"
+                        },
+                        "org_name": {
+                            "type": "keyword"
+                        },
+                        "parm_type": {
+                            "type": "keyword"
+                        },
+                        "time": {
+                            "type": "date"
+                        }
+                    }
+                }
+            }
+        },
+        'allSql': "select * from ic_certificate as a  where a.is_del='0' order by a.create_time",
+        'idFilterSql': "select * from ic_certificate as a  where a.is_del='0' and a.id in (%s) order by a.create_time "
     }
 }
 # 特殊的市到省的映射
@@ -120,7 +345,7 @@ def getRedisConnection():
     return red
 
 
-def createEsIndex(esIndexName):
+def createEsIndex(esIndexName, mapping):
     flag = es.indices.exists(esIndexName)
     if (not flag):
         es.indices.create(index=esIndexName, body=mapping)
@@ -152,12 +377,15 @@ def doAddData(objectName, _source=None, dataList=None):
     indexName = config['index_name']
     if (_source != None):
         idList = [x['id'] for x in _source]
-        dataList = config['queryData'](idList)
+        idFilterSql = config['idFilterSql']
+        dataList = doQueryData(idFilterSql, idList)
+        # dataList = config['queryData'](idFilterSql, idList)
 
     if ('AddBefore' in config and config['AddBefore'] is not None):
         dataList = config['AddBefore'](dataList)
     dictList = [{
         "_id": x['id'], "_index": indexName, "_type": "info", '_source': x} for x in dataList]
+    createEsIndex(indexName, config['mapping'])
     res = helpers.bulk(es, dictList)
     Log.v("insert es result %s ,data: %s" % (res, [x for x in dataList]))
 
@@ -188,11 +416,10 @@ def specialConvert(address):
     return address
 
 
-def doQueryUserData(idList):
+def doQueryData(sql, idList):
     idStr = ','.join(
         ["'" + x + "'" for x in idList])
-    dataList = pgSql.select(
-        "select * from ic_user a inner join ic_user_org b on a.id=b.id where a.is_del='0' and a.id in (%s)order by a.create_time" % idStr)
+    dataList = pgSql.select(sql % idStr)
     return dataList
 
 
@@ -266,25 +493,26 @@ def isNaN(num):
 
 
 # 从数据库中同步用户数据
-def syncUserData():
-    createEsIndex(xMap['UserOrgObj']['index_name'])
+def syncData(objectName, config):
     page = 1
     pageSize = 20
     count = 0
     while (True):
-        data = pgSql.select("select * from ic_user a inner join ic_user_org b on a.id=b.id where a.is_del='0' order by a.create_time", page, pageSize)
+        data = pgSql.select(config['allSql'], page,
+                            pageSize)
         Log.v(data)
         if (data is None or len(data) == 0):
             break
-        doAddData('UserOrgObj', dataList=data)
+        doAddData(objectName, dataList=data)
         page += 1
         count += len(data)
-    Log.v("成功入库用户数据 %s 条" % count)
+    Log.v("成功入库数据 %s, %s 条" % (objectName, count))
 
 
 # 从数据库中同步所有的数据
 def syncAllData():
-    syncUserData()
+    for k, v in xMap.items():
+        syncData(k, v)
 
 
 if __name__ == '__main__':
