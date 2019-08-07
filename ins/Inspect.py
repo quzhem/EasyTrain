@@ -73,6 +73,12 @@ mapping = {
                 },
                 "remark": {
                     "type": "keyword"
+                },
+                "create_time": {
+                    "type": "date"
+                },
+                "last_modified_time": {
+                    "type": "date"
                 }
             }
         }
