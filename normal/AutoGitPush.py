@@ -22,7 +22,7 @@ def main():
         ['jingdata-paas-metadata', 'jingdata-paas-message', 'jingdata-paas-search', 'jingdata-paas-org',
          'jingdata-paas-auth', 'jingdata-paas-datarights', 'jingdata-paas-log-collection', 'jingdata-saas-investment', 'jingdata-paas-log',
          'jingdata-paas-common', 'jingdata-paas-common-extend', 'jingdata-paas-common-strength', 'jingdata-paas-common-basic',
-         'jingdata-paas-template'])
+         'jingdata-paas-template','jingdata-paas-filestore'])
     test(['jingdata-admin-web'], '/Users/bjqxdn0702/Documents/36kr')
     Log.v("全部执行完成")
 
